@@ -51,22 +51,15 @@ def main():
 
     c = reset_block + ciphertext[8:16]
 
-    # for i in range(256):
-    #     c_modified = c[:7] + i.to_bytes(1, 'big') + c[8:]
-    #     print(c_modified.hex())
-    #     if oracle(c_modified, key, iv):
-    #         print("True value of the eighth byte:", i)
-    #         break
-
     i = 0
     for i in range(256):
-        c_modified = c[:15] + i.to_bytes(1, 'big')
+        c_modified = c[:7] + i.to_bytes(1, 'big') + c[8:]
         print(c_modified.hex())
         if oracle(c_modified, key, iv):
-            print("True value of the last byte:", i)
+            print("True value of the eighth byte:", i)
             break
 
-    print(xor(b'01', i.to_bytes(1, 'big'), b'38'))
+    print(xor(b'\x01', i.to_bytes(1, 'big'), b'\x7b'))
 
 
 if __name__ == '__main__':
