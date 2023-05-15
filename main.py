@@ -59,7 +59,7 @@ def main():
             print("True value of the eighth byte:", i)
             break
 
-    print(xor(b'\x01', i.to_bytes(1, 'big'), b'\x7b'))
+    print(xor(b'\x01', i.to_bytes(1, 'big'), ciphertext[7].to_bytes(1, 'big')))
 
 
 if __name__ == '__main__':
