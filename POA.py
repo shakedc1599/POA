@@ -1,11 +1,9 @@
 import sys
-
 from Cryptodome.Cipher import DES
 from Cryptodome.Util.Padding import pad, unpad
 
 
 def encrypt(padded_data, key, iv):
-
     # Create a DES cipher object in CBC mode
     cipher = DES.new(key, DES.MODE_CBC, iv)
 
@@ -49,8 +47,8 @@ def POA():
     iv = bytes.fromhex(sys.argv[3])
     block_size = 8
 
-    padded_data = pad(ciphertext, block_size)
-    ciphertext = encrypt(padded_data, key, iv)
+    # padded_data = pad(ciphertext, block_size)
+    # ciphertext = encrypt(padded_data, key, iv)
     blocks = [ciphertext[x: x + block_size] for x in range(0, len(ciphertext), block_size)]
     blocks = reversed_list(blocks)
     plaintext_after_decrypt = []
@@ -86,12 +84,9 @@ def POA():
 
             for x in range(256):
                 cipher_modified = c + second_block
-                print(cipher_modified.hex())
                 new_iv = cipher_modified[:8]
-
                 flag = oracle(cipher_modified[8:], key, new_iv)
                 if flag:
-                    print(cipher_modified.hex())
                     xj = c[7 - j]
                     p_tag2 = (j + 2).to_bytes(1, 'big')
                     plaintext_last_byte = xor(p_tag[0], ci_minus1_current, xj)

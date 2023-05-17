@@ -3,7 +3,6 @@ from Cryptodome.Util.Padding import pad, unpad
 
 
 def encrypt(padded_data, key, iv):
-
     # Create a DES cipher object in CBC mode
     cipher = DES.new(key, DES.MODE_CBC, iv)
 
