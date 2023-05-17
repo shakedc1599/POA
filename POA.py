@@ -31,25 +31,35 @@ def creat_next_xj(p_tag, previous_ci, previous_block, j):
     return xj
 
 
+def reversed_list(old_list):
+    """
+    Reverses the given list.
+    """
+    return old_list[::-1]
+
+
 def POA():
-    # Get the variables from the user and convert them from Hex.
+
+    # Gets the variables from the user and converts them from Hex.
     ciphertext = bytes.fromhex(sys.argv[1])
     key = bytes.fromhex(sys.argv[2])
     iv = bytes.fromhex(sys.argv[3])
 
-    # Define the block size.
+    # Defines the block size.
     block_size = 8
 
     # Split the ciphertext into blocks.
     blocks = [ciphertext[x: x + block_size] for x in range(0, len(ciphertext), block_size)]
 
     # Reverse the blocks.
-    blocks.reverse()
+    blocks = reversed_list(blocks)
 
     # Create a list to store the decrypted blocks.
     ciphertext_after_decryption = []
 
-    for i, second_block in enumerate(blocks):
+    for i in range(len(blocks)):
+        second_block = blocks[i]
+
         # If this is the last block, use the initialization vector as the first block.
         if i + 1 == len(blocks):
             first_block = iv
@@ -59,11 +69,11 @@ def POA():
         temp_xj = []
 
         # Create a list to store the previous Ci values.
-        previous_ci_minus1 = []
+        previous_ci__minus1 = []
         decipher_block = []
 
         for j in range(9):
-            # If this is the last iteration, add the decipher block and break.
+            # If this is the last iteration add the decipher block and break.
             if j == 8:
                 ciphertext_after_decryption.append(decipher_block)
                 break
@@ -72,7 +82,12 @@ def POA():
             if not temp_xj:
                 c = b'\x00' * (8 - j)
             else:
-                c = b'\x00' * (8 - j) + b''.join(temp_xj)
+                c = b'\x00' * (8 - j)
+                g = b''
+
+                for k in range(len(temp_xj)):
+                    g = g + temp_xj[k]
+                c = c + g
 
             # Create the p'.
             p_tag = (j + 1).to_bytes(1, 'big')
@@ -82,7 +97,7 @@ def POA():
             for x in range(256):
                 cipher_modified = c + second_block
 
-                # Create the new IV.
+                # Creat the new IV.
                 new_iv = cipher_modified[:8]
 
                 # If the decryption was successful.
@@ -91,9 +106,9 @@ def POA():
                     p_tag2 = (j + 2).to_bytes(1, 'big')
                     plaintext_last_byte = xor(p_tag[0], current_ci_minus1, xj)
                     decipher_block.append(plaintext_last_byte)
-                    previous_ci_minus1.append(current_ci_minus1)
-                    temp_xj = creat_next_xj(p_tag2, previous_ci_minus1, decipher_block, j + 1)
-                    temp_xj.reverse()
+                    previous_ci__minus1.append(current_ci_minus1)
+                    temp_xj = creat_next_xj(p_tag2, previous_ci__minus1, decipher_block, j + 1)
+                    temp_xj = reversed_list(temp_xj)
                     break
 
                 # Otherwise, set the current byte to the next possible value.
@@ -104,14 +119,14 @@ def POA():
 
     plaintext_blocks = []
 
-    # Go through each block, return the values in it to the original order, and then combine them.
+    # Go through each block and return the values in it to the original order and then combine them
     for blocks in ciphertext_after_decryption:
-        new_block = list(reversed(blocks))
+        new_block = reversed_list(blocks)
         new_block = b''.join(new_block)
         plaintext_blocks.append(new_block)
 
-    # Return the blocks to the correct order, unite them, and remove the padding.
-    plaintext_blocks.reverse()
+    # Return the blocks to the correct order, unite them and remove the padding.
+    plaintext_blocks = reversed_list(plaintext_blocks)
     plaintext = b''.join(plaintext_blocks)
     plaintext = unpad(plaintext, block_size)
 
