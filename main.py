@@ -1,5 +1,3 @@
-import binascii
-
 from Cryptodome.Cipher import DES
 from Cryptodome.Util.Padding import pad, unpad
 
